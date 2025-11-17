@@ -14,9 +14,16 @@ from dataclasses import dataclass, asdict, field
 from typing import List, Dict, Tuple, Optional, Any
 import random
 from datetime import datetime, timedelta
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    px, go, make_subplots = None, None, None
+    PLOTLY_AVAILABLE = False
+    st.warning("Plotly not available - charts will be simplified")
+
 import scipy.stats as stats
 
 # ==================== QUANTUM ENHANCED DATA MODELS ====================
