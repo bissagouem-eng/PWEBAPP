@@ -1,0 +1,13 @@
+streamlit
+pandas
+numpy
+scipy
+plotly
+scikit-learn
+selenium
+pdfplumber
+beautifulsoup4
+requests
+pillow
+openpyxl
+Add all missing packages (scipy, plotly, etc.)
