@@ -10,3 +10,4 @@ beautifulsoup4
 requests
 pillow
 openpyxl
+polars>=1.9
