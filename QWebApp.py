@@ -130,6 +130,7 @@ def pdf_to_race_record(pdf_bytes_or_path, filename: str = None):
 # ==========================
 # INDESTRUCTIBLE BUILD_DB WITH PROGRESS + ERROR LOG
 # ==========================
+@st.cache_data
 def build_db(zip_file=None, pdf_files=None):
     records = []
     errors = []
@@ -154,7 +155,19 @@ def build_db(zip_file=None, pdf_files=None):
                 errors.append((info.filename, str(e)))
             progress.progress((i + 1) / total)
 
-    # ... (same for single pdf_files list, just add filename=uploaded_file.name)
+    if pdf_files:  # Handle multiple PDFs
+        total = len(pdf_files)
+        progress = st.progress(0)
+        status = st.empty()
+        for i, uploaded_file in enumerate(pdf_files):
+            status.text(f"Processing {uploaded_file.name} ({i+1}/{total})")
+            try:
+                pdf_bytes = uploaded_file.read()
+                rec = pdf_to_race_record(pdf_bytes, filename=uploaded_file.name)
+                records.append(rec)
+            except Exception as e:
+                errors.append((uploaded_file.name, str(e)))
+            progress.progress((i + 1) / total)
 
     if errors:
         st.warning(f"⚠️ {len(errors)} PDFs skipped (check console/logs for details)")
@@ -175,10 +188,11 @@ st.title("🏆 QUANTUM LONAB PRO v12 – FINAL & INDESTRUCTIBLE")
 if st.button("🗑️ Clear cache & rebuild database", type="primary"):
     if CACHE_DB.exists():
         CACHE_DB.unlink()
+    st.cache_data.clear()
     st.rerun()
 
 zip_file = st.file_uploader("Upload your full archive (10GB max)", type="zip")
-pdfs = st.file_uploader("Or add daily PDFs", type="pdf", accept_multiple=True)
+pdfs = st.file_uploader("Or add daily PDFs", type="pdf", accept_multiple_files=True)  # FIXED HERE!
 
 db = build_db() if not CACHE_DB.exists() or zip_file or pdfs else pl.read_parquet(CACHE_DB)
 
