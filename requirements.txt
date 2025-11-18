@@ -11,3 +11,6 @@ requests
 pillow
 openpyxl
 polars>=1.9
+streamlit
+polars
+pymupdf
